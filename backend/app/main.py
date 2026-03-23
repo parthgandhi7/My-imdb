@@ -8,7 +8,7 @@ from app.db import get_session, init_db
 from app.models import Movie, Sentiment
 from app.schemas import AgentSearchRequest, AgentSearchResult, MovieCreate, MovieRead, MovieUpdate
 from app.services.agent import parse_intent
-from app.services.tmdb import TMDBClient, poster_url
+from app.services.omdb import OMDBClient, poster_url
 
 app = FastAPI(title="Movie Tracker API", version="1.0.0")
 
@@ -25,7 +25,7 @@ def _to_movie_read(movie: Movie) -> MovieRead:
     providers = [item.strip() for item in movie.providers.split(",") if item.strip()]
     return MovieRead(
         id=movie.id,
-        tmdb_id=movie.tmdb_id,
+        imdb_id=movie.imdb_id,
         title=movie.title,
         release_year=movie.release_year,
         overview=movie.overview,
@@ -56,7 +56,7 @@ def list_movies(session: Session = Depends(get_session)):
 def add_movie(payload: MovieCreate, session: Session = Depends(get_session)):
     movie = Movie(
         title=payload.title.strip(),
-        tmdb_id=payload.tmdb_id,
+        imdb_id=payload.imdb_id,
         release_year=payload.release_year,
         overview=payload.overview,
         poster_url=payload.poster_url,
@@ -102,40 +102,43 @@ def history(session: Session = Depends(get_session)):
 
 @app.post("/agent/search", response_model=list[AgentSearchResult])
 async def agent_search(payload: AgentSearchRequest, session: Session = Depends(get_session)):
-    client = TMDBClient()
+    client = OMDBClient()
     if not client.is_configured:
-        raise HTTPException(status_code=503, detail="TMDB_API_KEY is not configured")
+        raise HTTPException(status_code=503, detail="OMDB_API_KEY is not configured")
 
     intent = parse_intent(payload.prompt, provider=payload.provider)
-    watched_tmdb_ids = {
-        movie.tmdb_id
+    watched_imdb_ids = {
+        movie.imdb_id
         for movie in session.exec(select(Movie).where(Movie.watched.is_(True))).all()
-        if movie.tmdb_id is not None
+        if movie.imdb_id is not None
     }
 
-    discovered = await client.discover_movies(years=intent.years, limit=payload.limit * 3)
+    discovered = await client.search_movies(intent.query, year=max(intent.years) if intent.years else None, limit=payload.limit * 3)
     if not discovered:
-        discovered = await client.search_movies(intent.query, limit=payload.limit * 3)
+        discovered = await client.discover_movies(years=intent.years, limit=payload.limit * 3)
 
     results: list[AgentSearchResult] = []
     for item in discovered:
-        tmdb_id = item.get("id")
-        if not tmdb_id or tmdb_id in watched_tmdb_ids:
+        imdb_id = item.get("imdbID")
+        if not imdb_id or imdb_id in watched_imdb_ids:
             continue
 
-        providers = await client.movie_watch_providers(tmdb_id)
-        if intent.provider:
+        providers = await client.movie_watch_providers(imdb_id)
+        if intent.provider and providers:
             normalized = {p.lower() for p in providers}
             if intent.provider not in normalized:
                 continue
 
+        year = item.get("Year")
+        release_date = f"{year}-01-01" if year and year.isdigit() else None
+
         results.append(
             AgentSearchResult(
-                tmdb_id=tmdb_id,
-                title=item.get("title") or item.get("name") or "Unknown",
-                release_date=item.get("release_date"),
-                overview=item.get("overview"),
-                poster_url=poster_url(item.get("poster_path")),
+                imdb_id=imdb_id,
+                title=item.get("Title") or "Unknown",
+                release_date=release_date,
+                overview=item.get("Plot") if item.get("Plot") != "N/A" else None,
+                poster_url=poster_url(item.get("Poster")),
                 genres=intent.genres,
                 providers=providers,
             )

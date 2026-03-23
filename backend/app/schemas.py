@@ -7,7 +7,7 @@ from app.models import Sentiment
 
 class MovieCreate(BaseModel):
     title: str = Field(min_length=1)
-    tmdb_id: Optional[int] = None
+    imdb_id: Optional[str] = None
     release_year: Optional[int] = None
     overview: Optional[str] = None
     poster_url: Optional[str] = None
@@ -22,7 +22,7 @@ class MovieUpdate(BaseModel):
 
 class MovieRead(BaseModel):
     id: int
-    tmdb_id: Optional[int]
+    imdb_id: Optional[str]
     title: str
     release_year: Optional[int]
     overview: Optional[str]
@@ -39,7 +39,7 @@ class AgentSearchRequest(BaseModel):
 
 
 class AgentSearchResult(BaseModel):
-    tmdb_id: int
+    imdb_id: str
     title: str
     release_date: Optional[str]
     overview: Optional[str]
