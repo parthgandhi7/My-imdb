@@ -1,0 +1,32 @@
+# Backend (FastAPI)
+
+## Features
+- Movie CRUD with watch status and like/dislike sentiment.
+- Two list endpoints for **Watchlist** and **History**.
+- AI search endpoint that interprets natural language and queries TMDB.
+- Provider filter support (e.g., Netflix-only results).
+- Excludes watched TMDB titles from agent recommendations.
+
+## Setup
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+```
+
+Create `.env` and add:
+```env
+TMDB_API_KEY=your_tmdb_api_key
+```
+
+## Run
+```bash
+uvicorn app.main:app --reload --port 8000
+```
+
+## Test
+```bash
+PYTHONPATH=. pytest
+```
