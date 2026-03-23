@@ -50,3 +50,23 @@ The app:
 - Backend docs: `backend/README.md`
 - Frontend docs: `frontend/README.md`
 - Deployment docs: `DEPLOYMENT.md`
+
+## GitHub Actions + Vercel Deployment
+This repository now includes `.github/workflows/vercel.yml` to automatically:
+- Run frontend build checks on every PR to `main` and every push to `main`.
+- Deploy **Preview** builds for pull requests.
+- Deploy **Production** builds for pushes to `main`.
+
+### Required GitHub secrets
+- `VERCEL_TOKEN`
+- `VERCEL_ORG_ID`
+- `VERCEL_PROJECT_ID`
+
+### Required Vercel environment variable
+Set this in your Vercel project so the frontend can talk to the API:
+- `VITE_API_BASE_URL` (for example, your deployed backend URL)
+
+### Where to find the deployed URL
+After the workflow runs, open the workflow run in GitHub Actions and check the **job summary** for:
+- `Preview deployment URL: ...` (for PRs)
+- `Production deployment URL: ...` (for pushes to `main`)

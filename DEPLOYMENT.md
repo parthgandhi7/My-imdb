@@ -21,6 +21,7 @@
    ```
 3. Output directory: `dist`.
 4. Add `VITE_API_BASE_URL` to point to backend URL.
+5. Ensure backend CORS allows your Vercel domain (set `CORS_ALLOW_ORIGINS` and/or use `*.vercel.app`).
 
 ## 3) CI/CD secret management (recommended)
 Use CI/CD secrets instead of committing keys in files.
