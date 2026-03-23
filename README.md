@@ -70,3 +70,10 @@ Set this in your Vercel project so the frontend can talk to the API:
 After the workflow runs, open the workflow run in GitHub Actions and check the **job summary** for:
 - `Preview deployment URL: ...` (for PRs)
 - `Production deployment URL: ...` (for pushes to `main`)
+
+### If you see `react-scripts build exited with 127` on Vercel
+That means Vercel is using old Create React App build settings. This repo uses **Vite**.
+- `vercel.json` (repo root) now forces build from `frontend/`.
+- `frontend/vercel.json` also enforces Vite settings when the Vercel project root is set to `frontend`.
+
+After pulling latest code, trigger a redeploy.
