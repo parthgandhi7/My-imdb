@@ -12,7 +12,7 @@ function mapSuggestionToMovie(suggestion) {
   const releaseYear = suggestion.release_date ? Number(suggestion.release_date.slice(0, 4)) : null;
   return {
     title: suggestion.title,
-    tmdb_id: suggestion.tmdb_id,
+    imdb_id: suggestion.imdb_id,
     release_year: Number.isNaN(releaseYear) ? null : releaseYear,
     overview: suggestion.overview,
     poster_url: suggestion.poster_url,
@@ -85,7 +85,7 @@ export default function App() {
     <main className="container">
       <header>
         <h1>Movie Tracker</h1>
-        <p>Track watchlist/history and discover movies using AI + TMDB.</p>
+        <p>Track watchlist/history and discover movies using AI + OMDb.</p>
       </header>
 
       <section className="agent-box">
@@ -106,7 +106,7 @@ export default function App() {
         </form>
         <div className="suggestions">
           {suggestions.map((item) => (
-            <article key={item.tmdb_id} className="suggestion-card">
+            <article key={item.imdb_id} className="suggestion-card">
               <h3>{item.title}</h3>
               <p>{item.overview || "No overview available."}</p>
               <p>

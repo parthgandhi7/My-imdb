@@ -13,7 +13,7 @@ class Sentiment(str, Enum):
 
 class Movie(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    tmdb_id: Optional[int] = Field(default=None, index=True)
+    imdb_id: Optional[str] = Field(default=None, index=True)
     title: str = Field(index=True)
     release_year: Optional[int] = Field(default=None, index=True)
     overview: Optional[str] = None

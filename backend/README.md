@@ -3,9 +3,8 @@
 ## Features
 - Movie CRUD with watch status and like/dislike sentiment.
 - Two list endpoints for **Watchlist** and **History**.
-- AI search endpoint that interprets natural language and queries TMDB.
-- Provider filter support (e.g., Netflix-only results).
-- Excludes watched TMDB titles from agent recommendations.
+- AI search endpoint that interprets natural language and queries OMDb.
+- Excludes watched OMDb/IMDb titles from agent recommendations.
 
 ## Setup
 ```bash
@@ -18,7 +17,7 @@ cp .env.example .env
 
 Create `.env` and add:
 ```env
-TMDB_API_KEY=your_tmdb_api_key
+OMDB_API_KEY=your_omdb_api_key
 ```
 
 ## Run
